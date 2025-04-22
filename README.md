@@ -61,6 +61,30 @@ Here's how we handle your credentials:
 6. Open [https://localhost:3000](https://localhost:3000) with your browser to see the result.
 7. Have at it!
 
+## Docker
+
+This project includes Docker configuration for easy containerization and deployment:
+
+1. **Build the Docker image**:
+   ```bash
+   docker build -t perpetua-digital-assistant .
+   ```
+
+2. **Run the container**:
+   ```bash
+   docker run -p 3000:3000 -e NODE_ENV=production perpetua-digital-assistant
+   ```
+
+3. **Environment Variables**: 
+   - Create a `.env.local` file with your environment variables before building
+   - Or pass them directly when running the container:
+   ```bash
+   docker run -p 3000:3000 -e NEXT_PUBLIC_KEY=value perpetua-digital-assistant
+   ```
+
+4. **Access the application**:
+   - Open [http://localhost:3000](http://localhost:3000) in your browser
+
 ## API Routes
 The API routes that interact with Launch are under `/api/reactor/`. I have attempted to match the names of the routes to the same as they as named in the [Reactor Node SDK](https://github.com/adobe/reactor-sdk-javascript/tree/master) without being too verbose. 
 
