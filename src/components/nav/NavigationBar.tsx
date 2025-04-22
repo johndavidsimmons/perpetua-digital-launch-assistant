@@ -7,7 +7,6 @@ import Image from 'next/image';
 import ShowMenu from '@spectrum-icons/workflow/ShowMenu';
 import Search from '@spectrum-icons/workflow/Search';
 import Settings from '@spectrum-icons/workflow/Settings';
-import HelpOutline from '@spectrum-icons/workflow/HelpOutline';
 
 import { PRODUCT_NAME } from '@/lib/constants';
 
@@ -30,7 +29,6 @@ const MENU_ITEMS = {
 
         { icon: <Search size='S' />, text: 'Home', href: '/' },
         { icon: <Settings size='S' />, text: 'Settings', href: '/settings' },
-        { icon: <HelpOutline size='S' />, text: 'Support', href: '/support' }
     ]
 }
 
