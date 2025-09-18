@@ -6,45 +6,9 @@ import { useAnalytics } from '@/app/hooks/useAnalytics';
 import { TruncatedReactorAPIResponseItem } from '@/lib/types';
 import { useApiKeys } from '@/app/hooks/useApiKeys';
 import { createApiHeaders } from '@/lib/apiUtils';
+import { downloadCSV, flattenItem } from '@/lib/exportUtils';
 import { useState } from 'react';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const downloadCSV = (data: any[], filename: string) => {
-    // Get headers from first item's keys
-    const headers = Object.keys(data[0]);
-
-    // Create CSV rows
-    const csvRows = [
-        headers.join(','), // Header row
-        ...data.map(row => headers.map(header =>
-            // Wrap values in quotes and escape existing quotes
-            `"${String(row[header] || '').replace(/"/g, '""')}"`
-        ).join(','))
-    ];
-
-    // Create blob and download
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    if (link.download !== undefined) {
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', filename);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-};
-
-const flattenDataElement = (item: TruncatedReactorAPIResponseItem) => {
-    const { id, type, attributes } = item;
-    return {
-        id,
-        type,
-        ...attributes
-    };
-};
 
 const LibraryExport = ({ selectedCompany, selectedProperty }: { selectedCompany: { id: string; name: string }, selectedProperty: { id: string; name: string } }) => {
     const { apiKeys } = useApiKeys();
@@ -73,7 +37,7 @@ const LibraryExport = ({ selectedCompany, selectedProperty }: { selectedCompany:
                             if (!response.ok) throw new Error('Failed to fetch data elements');
 
                             const data: TruncatedReactorAPIResponseItem[] = await response.json();
-                            const flattenedData = data.map(flattenDataElement);
+                            const flattenedData = data.map(flattenItem);
 
                             const filename = `${selectedProperty.name.replace(/\s+/g, '')}_data_elements.csv`;
                             downloadCSV(flattenedData, filename);
@@ -108,7 +72,7 @@ const LibraryExport = ({ selectedCompany, selectedProperty }: { selectedCompany:
                             if (!response.ok) throw new Error('Failed to fetch rules');
 
                             const data: TruncatedReactorAPIResponseItem[] = await response.json();
-                            const flattenedData = data.map(flattenDataElement);
+                            const flattenedData = data.map(flattenItem);
 
                             const filename = `${selectedProperty.name.replace(/\s+/g, '')}_rules.csv`;
                             downloadCSV(flattenedData, filename);
@@ -144,7 +108,7 @@ const LibraryExport = ({ selectedCompany, selectedProperty }: { selectedCompany:
                             if (!response.ok) throw new Error('Failed to fetch libraries');
 
                             const data: TruncatedReactorAPIResponseItem[] = await response.json();
-                            const flattenedData = data.map(flattenDataElement);
+                            const flattenedData = data.map(flattenItem);
 
                             const filename = `${selectedProperty.name.replace(/\s+/g, '')}_libraries.csv`;
                             downloadCSV(flattenedData, filename);

@@ -1,11 +1,12 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { createApiHeaders } from '@/lib/apiUtils';
-import { Flex, Item, Text, ListView, Divider } from "@adobe/react-spectrum";
+import { Flex, Item, Text, ListView, Divider, Button } from "@adobe/react-spectrum";
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorMessage from '@/components/ErrorMessage';
 import { TruncatedReactorAPIResponseItem } from '@/lib/types';
 import { useAnalytics } from '@/app/hooks/useAnalytics';
+import { exportDataElementsToCSV, exportRulesToCSV, formatDelegateDescriptorId } from '@/lib/exportUtils';
 
 // Components
 import NoResultsMessage from '@/components/relationships/NoResultsMessage';
@@ -19,6 +20,7 @@ import LinkOut from '@spectrum-icons/workflow/LinkOut';
 import Hammer from '@spectrum-icons/workflow/Hammer';
 import Data from '@spectrum-icons/workflow/Data';
 import ArrowRight from '@spectrum-icons/workflow/ArrowRight';
+import Export from '@spectrum-icons/workflow/Export';
 
 
 // utils
@@ -52,12 +54,7 @@ const searchComponentSettings = (
     return Array.from(matches);
 };
 
-const formatDelegateDescriptorId = (delegate_descriptor_id: string) => {
-    if (delegate_descriptor_id == '') return '';
-    const [_, type, ..._rest] = delegate_descriptor_id.split('::');
-    const typeVar = type.charAt(0).toUpperCase() + type.slice(1, -1);
-    return typeVar;
-};
+
 
 const Relationships = ({ selectedCompany, selectedProperty, apiKeys }: { selectedCompany: { id: string; name: string }, selectedProperty: { id: string; name: string }, apiKeys: { clientId: string; clientSecret: string; orgId: string; } | null }) => {
     const { event } = useAnalytics();
@@ -241,6 +238,8 @@ const Relationships = ({ selectedCompany, selectedProperty, apiKeys }: { selecte
         }
     }, [ruleSearchResults, ruleSearchResultsLoading, selectedDataElement?.id]);
 
+    console.log(selectedDataElement)
+
     return (
         <Flex direction="column" gap="size-200" minHeight="100vh">
             {error && <ErrorMessage message={error} />}
@@ -282,7 +281,21 @@ const Relationships = ({ selectedCompany, selectedProperty, apiKeys }: { selecte
                             <ArrowRight size='L' color={arrowColor1} />
                         </Flex>
                         <Flex direction="column" gap="size-100" width="50%">
-                            <h3><Data size='S' />{" "} Data Elements {searchResults.length ? `(${searchResults.length})` : ''}</h3>
+                            <h3 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span><Data size='S' />{" "} Data Elements {searchResults.length ? `(${searchResults.length})` : ''}</span>
+                                {searchResults.length > 0 && (
+                                    <Button variant="primary"
+                                        onPress={() => {
+                                            exportDataElementsToCSV(searchResults, selectedProperty.name, selectedRule.name);
+                                            event({ action: 'exportRelationshipDataElements', category: 'engagement', label: 'relationships', value: 1 });
+                                        }}
+                                    >
+                                        <Export size='S' />
+                                        <Text>Export to CSV</Text>
+                                    </Button>
+                                )}
+                            </h3>
+
                             {ruleComponentsLoading && <LoadingSpinner />}
                             {!ruleComponentsLoading && (
                                 <>
@@ -354,7 +367,20 @@ const Relationships = ({ selectedCompany, selectedProperty, apiKeys }: { selecte
                             <ArrowRight size='L' color={arrowColor2} />
                         </Flex>
                         <Flex direction="column" gap="size-100" width="50%">
-                            <h3><Hammer size='S' />{" "}Rules {ruleSearchResults.length ? `(${ruleSearchResults.length})` : ''}</h3>
+                            <h3 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span><Hammer size='S' />{" "}Rules {ruleSearchResults.length ? `(${ruleSearchResults.length})` : ''}</span>
+                                {ruleSearchResults.length > 0 && (
+                                    <Button variant="primary"
+                                        onPress={() => {
+                                            exportRulesToCSV(ruleSearchResults, selectedProperty.name, selectedDataElement?.name || '');
+                                            event({ action: 'exportRelationshipRules', category: 'engagement', label: 'relationships', value: 1 });
+                                        }}
+                                    >
+                                        <Export size='S' />
+                                        <Text>Export to CSV</Text>
+                                    </Button>
+                                )}
+                            </h3>
                             {ruleSearchResultsLoading && <LoadingSpinner />}
                             {!ruleSearchResultsLoading && (
                                 <>
