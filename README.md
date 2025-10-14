@@ -53,13 +53,49 @@ Here's how we handle your credentials:
 
 ## Getting Started
 
+### Local Development with Node
+
 1. Fork this repository and clone it to your local machine
-2. Make an `.env.local` file using the `NEXT_PUBLIC_` values from `.env.sample`. Message me if you need other keys.
+2. Make an `.env.local` file using the values from `.env.sample`.
 3. Run `npm install` to install dependencies
 4. Run `npm run dev` to start the development server
 5. `next dev --experimental-https` should make you an SSL certificate and run the dev server over HTTPS
 6. Open [https://localhost:3000](https://localhost:3000) with your browser to see the result.
 7. Have at it!
+
+### Docker Setup
+
+#### Prerequisites
+- Docker installed
+
+#### Quick Start
+
+1. Fork this repository and clone it to your local machine
+2. Make an `.env.local` file using the values from `.env.sample`.
+3. Start the development server:
+   ```bash
+   npm run docker:up
+   ```
+4. Open [https://localhost:3000](https://localhost:3000) in your browser
+
+#### Docker Commands
+
+```bash
+# Start dev server (with logs visible)
+npm run docker:up
+
+# Stop dev server
+npm run docker:down
+
+# Rebuild the container (after package.json changes)
+npm run docker:build
+
+# View logs from running container
+npm run docker:logs
+```
+
+#### Notes
+- NODE_TLS_REJECT_UNAUTHORIZED=0 is set in the docker-compose.yml file to allow self-signed certificates. This is only for development and should not be used in production. This is disabled because your work computer probably would block these requests otherwise and the tool would be unusable. 
 
 ## API Routes
 The API routes that interact with Launch are under `/api/reactor/`. I have attempted to match the names of the routes to the same as they as named in the [Reactor Node SDK](https://github.com/adobe/reactor-sdk-javascript/tree/master) without being too verbose. 

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot reload
+      - .:/app
+      # Prevent node_modules from being overwritten
+      - /app/node_modules
+      # Preserve Next.js build cache
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      # Disable certificate verification for self-signed certs in dev
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      # Default values from .env.sample
+      - NEXT_PUBLIC_ENV=development
+      - NEXT_PUBLIC_API_BASE_URL=https://localhost:3000/api
+      - NEXT_PUBLIC_APP_URL=https://localhost:3000
+    env_file:
+      # Will override defaults above if file exists
+      - .env.local
+    command: npm run dev
+    stdin_open: true
+    tty: true
